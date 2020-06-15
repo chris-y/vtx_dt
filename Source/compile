@@ -1,0 +1,5 @@
+gcc -o videotex.datatype init.c class.c -nostartfiles -O3 ;-ggdb -g
+strip videotex.datatype
+copy videotex.datatype sys:classes/datatypes/
+avail flush
+avail flush

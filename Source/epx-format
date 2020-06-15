@@ -1,0 +1,1 @@
+ basically "JWC", (number of frames in file), 00 00, then that many frames (25x40, each prefixed by FE 01 09 00 00 00 and terminated with 00 00). Individual frames in that format - i.e. without the six-byte 'JWC' header - are 'EP1' files, as used by various editors like http://www.fab-online.com/eng/teletext/basic/ettwin.htm

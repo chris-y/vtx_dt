@@ -1,0 +1,3 @@
+; autoinstall for vtx_dt
+cd vtx_dt
+Installer Install APPNAME DTAutoInstall DEFUSER NOVICE

@@ -1,0 +1,52 @@
+; Datatype installer - Chris Young
+
+(if (= @app-name "DTAutoInstall") (set #AutoInstall 1))
+(if (<> #AutoInstall 1) (welcome))
+
+(set @default-dest "Devs:DataTypes")
+
+(complete 0)
+
+(copyfiles
+	(prompt "Copying Datatype descriptor")
+	(help @copyfiles-help)
+	(source "data")
+	(dest "Devs:Datatypes")
+	(choices "Videotex" "Teletext")
+	(infos)
+	(noposition)
+)
+
+(complete 25)
+
+(copylib
+	(prompt "Copying datatype")
+	(help @copylib-help)
+	(source "data/videotex.datatype")
+	(dest "SYS:Classes/Datatypes")
+)
+
+(complete 50)
+
+(copyfiles
+	(prompt "Copying fonts")
+	(help @copyfiles-help)
+	(source "data/fonts")
+	(dest "FONTS:")
+	(all)
+)
+
+(complete 75)
+
+(run "adddatatypes refresh")
+
+(complete 100)
+
+(if (= #AutoInstall 1)
+	(
+		(exit (quiet))
+	)
+	(
+		(exit)
+	)
+)

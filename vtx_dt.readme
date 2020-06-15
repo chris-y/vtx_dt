@@ -1,0 +1,67 @@
+Short:        viewdata/videotex/teletext frame datatype
+Uploader:     chris@unsatisfactorysoftware.co.uk (Chris Young)
+Author:       chris@unsatisfactorysoftware.co.uk (Chris Young)
+Type:         util/dtype
+Version:      1.3a
+URL:          http://www.unsatisfactorysoftware.co.uk/
+Architecture: ppc-amigaos >= 4.0.0
+
+This datatype allows you to view CEPT-3 format frames and carousels
+(commonly known as videotex, teletext, viewdata or prestel frames)
+It only supports full frames (960 byte file of 40x24 characters)
+and carousels of full frames.  You can create carousels by joining
+single frames together with the JOIN command.  Carousels MUST have
+the extension ".car" to be detected by the datatype.  Frames MUST
+have the extension ".bin".  As of v1.5, EP1 and EPX format files
+are also supported.  These are detected on teh file header so can
+have any extension.
+
+It requires the MtA font (included).  This is a modified version of
+the MtA font from the PstView archive, where I have changed the
+font to the UK character set.  If you need the accented characters,
+you might want to use the original instead.
+
+Known bugs and limitations
+
+Conceal, flash and steady are not supported.  These codes will be
+ignored (concealed text will be printed as if it had been revealed)
+
+There are two descriptors as Datatypes picks some files up as binary
+and others as ASCII, so you need a descriptor for each type.
+Which is ASCII and which is binary is arbitrary and the author can't
+remember five minutes after recreating them.
+
+Most of the icons are by Ken "Ken's Icons" Lester.
+
+As usual, I can and will not accept responsibility for any damage,
+loss of data etc incurred through use of this software.  This archive
+is provided "as-is" without warranty of any kind and all use is at
+your own risk.
+
+Please check the PGP signature in the Aminet readme against the
+archive to ensure it has not been tampered with.
+
+v1.5 (06/03/2010)
+* Added support for EP1 and EPX format files.
+
+v1.4
+* ??? (not released)
+
+v1.3a (12/01/2008)
+* Descriptor changed - now files must end in .BIN or .CAR to be recognised
+
+v1.3 (10/04/2007)
+* Fixed a potential unreferenced memory access which particulary showed up when running Eastern
+* Fixed a potential buffer over-run
+* Previous release didn't close the double-height font
+
+v1.2 (26/03/2007)
+* Oops, forgot to close diskfont.library
+* Fixed the double-height issue
+* Depth is now reported correctly in Multiview
+* Carousels are now supported
+* Capital letters in graphics mode now show up correctly
+* Modified the double-height font to the correct UK character set
+
+v1.1 (25/03/2007)
+* First release
