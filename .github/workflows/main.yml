@@ -1,0 +1,24 @@
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+ 
+jobs:
+  build_ppc:
+    runs-on: ubuntu-latest
+    container:
+      image: amigadev/crosstools:ppc-amigaos
+    name: build_os4
+    steps:
+      - uses: actions/checkout@v2
+      - name: build_os4
+        id: build_os4
+        run: |
+          cd ./Source
+          gcc -o videotex.datatype init.c class.c -nostartfiles -O3 -mcrt=clib2
+      - uses: actions/upload-artifact@v1
+        with:
+          name: videotex.datatype
+          path: ./videotex.datatype
+
