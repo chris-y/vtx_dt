@@ -16,9 +16,10 @@ jobs:
         id: build_os4
         run: |
           cd ./Source
+          gcc -o videotex.datatype.debug init.c class.c -gstabs -nostartfiles -mcrt=clib2
           gcc -o videotex.datatype init.c class.c -nostartfiles -O3 -mcrt=clib2
       - uses: actions/upload-artifact@v1
         with:
-          name: videotex.datatype
+          name: videotex.datatype*
           path: ./Source/videotex.datatype
 
