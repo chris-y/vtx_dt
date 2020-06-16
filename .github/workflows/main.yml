@@ -20,6 +20,6 @@ jobs:
           gcc -o videotex.datatype init.c class.c -nostartfiles -O3 -mcrt=clib2
       - uses: actions/upload-artifact@v1
         with:
-          name: videotex.datatype*
-          path: ./Source/videotex.datatype
+          name: videotex.datatype
+          path: ./Source/videotex.datatype*
 
