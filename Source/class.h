@@ -1,6 +1,5 @@
 /*
- * ico.datatype
- * (c) Fredrik Wikstrom
+ * videotex.datatype
  */
 
 #ifndef ICO_CLASS_H
@@ -61,6 +60,7 @@ struct ClassBase {
 #define VTX_RAW 0
 #define VTX_EP1 1
 #define VTX_EPX 2
+#define VTX_VIEWDATA 3
 
 Class *initDTClass (struct ClassBase *libBase);
 BOOL freeDTClass (struct ClassBase *libBase, Class *cl);

@@ -204,6 +204,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 	uint32 vtxformat = VTX_RAW;
 	int esc = 0;
 	char header[10];
+	ULONG framestart[256];
 
 	IDOS->ChangeFilePosition(file,0,OFFSET_BEGINNING);
 
@@ -226,9 +227,31 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 	if(vtxformat == VTX_RAW)
 	{
+		int newtotal = 0;
 		fib = IDOS->AllocDosObject(DOS_FIB,NULL);
 		IDOS->ExamineFH(file,fib);
-		if(total) *total = fib->fib_Size / 960;
+
+		framestart[0] = 0;
+
+		for(int i=0;i<fib->fib_Size;i++) {
+			vtxchar = IDOS->FGetC(file);
+			if(vtxchar == -1) break;
+			vtxchar &= 0x7F;
+			if(vtxchar == 0x0C) {
+				newtotal++;
+				framestart[newtotal] = i+1;
+				vtxformat = VTX_VIEWDATA;
+			}
+		}
+
+		if(newtotal != 0) {
+			
+		} else {
+			newtotal = fib->fib_Size / 960;
+		}
+
+		if(total) *total = newtotal;
+
 		IDOS->FreeDosObject(DOS_FIB,fib);
 	}
 
@@ -239,6 +262,10 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 	switch(vtxformat)
 	{
+		case VTX_VIEWDATA:
+			IDOS->ChangeFilePosition(file,framestart[index],OFFSET_BEGINNING);
+		break;
+
 		case VTX_RAW:
 			IDOS->ChangeFilePosition(file,index*(charheight * charwidth),OFFSET_BEGINNING);
 		break;
@@ -310,7 +337,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 		heldchar=32;
 		hold=0;
 
-		if(dbl==1) {
+		if((dbl==1) && (vtxformat != VTX_VIEWDATA)) {
 			IDOS->ChangeFilePosition(file,40,OFFSET_CURRENT);
 			row++;
 			if(row>=charheight) break;
@@ -329,12 +356,34 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 			if(vtxchar == 0x0D) break;
 
+			if(vtxchar == 0x0C) break; // CS (should be double break)
+			if(vtxchar == 0x08) { // APB
+				col-=2;
+				continue;
+			}
+			if(vtxchar == 0x09) { // APF
+				continue;
+			}
+			if(vtxchar == 0x0A) { // APD
+				row++;
+				continue;
+			}
+			if(vtxchar == 0x0B) { // APU
+				row--;
+				continue;
+			}
+			if(vtxchar == 0x1E) { // APH
+				row=0;
+				col=-1;
+				continue;
+			}
+
 			if(vtxchar==0x1B) {
 				vtxchar = IDOS->FGetC(file);
 				if(vtxchar == -1) break;
 				vtxchar &= 0x7F;
 
-				esc = 1; // ignore non-escape codes from now on
+				vtxformat = VTX_VIEWDATA; // ignore non-escape codes from now on
 
 				if(vtxchar>=0x40 && vtxchar<=0x47) {
 					fcol=vtxchar-0x40;
@@ -398,7 +447,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				}
 			}
 
-			if(esc == 0) {
+			if(vtxformat != VTX_VIEWDATA) {
 				if(vtxchar>=0x00 && vtxchar<=0x07) {
 					fcol=vtxchar;
 					gfx=0;
