@@ -325,6 +325,8 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			if(vtxchar == -1) break;
 			vtxchar &= 0x7F;
 
+			if(vtxchar == 0x0D) break;
+
 			if(vtxchar==0x1B) {
 				vtxchar = IDOS->FGetC(file);
 				if(vtxchar == -1) break;
