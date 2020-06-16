@@ -67,6 +67,8 @@ void overlaytext(long xoffset,long yoffset,UBYTE text,ULONG pix,ULONG pix2,struc
 
 				for(x=0;x<z;x++)
 				{
+					if(i >= width * height) return;
+
 					if(tc & 0x80)
 					{
 						iconimg[i]=pix;
