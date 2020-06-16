@@ -338,7 +338,8 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 		font=tfont;
 
-		for(col=0; col<charwidth; col++) {
+		col = 0;
+		while(col<charwidth) {
 			vtxchar = IDOS->FGetC(file);
 
 			// need to write our bitmap here
@@ -347,7 +348,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			vtxchar &= 0x7F;
 
 			if(vtxchar == 0x0D) { // APR
-				col = -1;
+				col = 0;
 				continue;
 			}
 
@@ -355,10 +356,11 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 #if 0 // prestel active position codes
 			if(vtxchar == 0x08) { // APB
-				col-=2;
+				col--;
 				continue;
 			}
 			if(vtxchar == 0x09) { // APF
+				col++;
 				continue;
 			}
 			if(vtxchar == 0x0A) { // APD
@@ -372,7 +374,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 #endif
 			if(vtxchar == 0x1E) { // APH
 				row=0;
-				col=-1;
+				col=0;
 				continue;
 			}
 
@@ -527,6 +529,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 			//	if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
 			}
+			col++;
 		}
 	}
 
