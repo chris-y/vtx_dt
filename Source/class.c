@@ -354,7 +354,6 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 //			if(vtxchar == 0x0C) break; // CS (should be double break)
 
-
 			if(vtxchar == 0x08) { // APB
 				col--;
 				if(col == -1) {
@@ -388,6 +387,11 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				continue;
 			}
 #endif
+
+			if((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar <= 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F)) {
+				//undefined or unsupported
+				continue;
+			} 
 
 			if(vtxchar==0x1B) {
 				vtxchar = IDOS->FGetC(file);
