@@ -21,5 +21,8 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: videotex.datatype
-          path: ./Source/videotex.datatype*
-
+          path: ./Source/videotex.datatype
+      - uses: actions/upload-artifact@v1
+        with:
+          name: videotex.datatype.debug
+          path: ./Source/videotex.datatype.debug
