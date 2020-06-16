@@ -318,14 +318,14 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 		dbl=0;
 
 		for(col=0; col<charwidth; col++) {
-			vtxchar = IDOS->FGetC(file);
+			vtxchar = IDOS->FGetC(file) & 0x7F;
 
 			// need to write our bitmap here
 
 			if(vtxchar == -1) break;
 
 			if(vtxchar==0x1B) {
-				vtxchar = IDOS->FGetC(file);
+				vtxchar = IDOS->FGetC(file) & 0x7F;
 				esc = 1; // ignore non-escape codes from now on
 
 				if(vtxchar>=0x40 && vtxchar<=0x47) {
