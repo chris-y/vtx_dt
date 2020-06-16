@@ -388,7 +388,8 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			}
 #endif
 
-			if((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar <= 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F)) {
+			if((vtxformat == VTX_VIEWDATA) &&
+				((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar < 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F))) {
 				//undefined or unsupported
 				continue;
 			} 
