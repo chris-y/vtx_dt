@@ -181,7 +181,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 	uint32 fileoffs;
 	int32 numcolors;
 	uint32 num;
-    int size;
+	int size;
 	int32 level = 0;
 	struct ColorRegister *cmap = NULL;
 	uint32 *cregs = NULL;		
@@ -257,27 +257,26 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 	// this is a workaround for a bug in picture.datatype 52.1
 
-		IDataTypes->GetDTAttrs(o,
-			PDTA_NumColors,&coltemp,
-			TAG_END);
+	IDataTypes->GetDTAttrs(o,
+		PDTA_NumColors,&coltemp,
+		TAG_END);
 
-		if(coltemp>0)
-		{
-			IDataTypes->SetDTAttrs(o, NULL, NULL,
-				PDTA_NumColors,0,
-				TAG_END);
-		}
+	if(coltemp>0) {
+		IDataTypes->SetDTAttrs(o, NULL, NULL,
+			PDTA_NumColors,0,
+			TAG_END);
+	}
 
 	// end workaround
 
-		IDataTypes->SetDTAttrs(o, NULL, NULL,
-			PDTA_NumColors,8,
-			TAG_END);
+	IDataTypes->SetDTAttrs(o, NULL, NULL,
+		PDTA_NumColors,8,
+		TAG_END);
 
-		IDataTypes->GetDTAttrs(o,
-			PDTA_ColorRegisters,	&cmap,
-			PDTA_CRegs,				&cregs,
-			TAG_END); // == 2
+	IDataTypes->GetDTAttrs(o,
+		PDTA_ColorRegisters,	&cmap,
+		PDTA_CRegs,				&cregs,
+		TAG_END); // == 2
 
         bitmap = (unsigned char *) IExec->AllocVec(height*width,MEMF_CLEAR);
 		if(!bitmap) return ERROR_NO_FREE_STORE;
@@ -292,223 +291,186 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 		tattrdbl.tta_Tags = texttags;
 */
 
-		tfont = IDiskfont->OpenDiskFont((struct TextAttr *)&tattr);
-		tfontdbl = IDiskfont->OpenDiskFont((struct TextAttr *)&tattrdbl);
+	tfont = IDiskfont->OpenDiskFont((struct TextAttr *)&tattr);
+	tfontdbl = IDiskfont->OpenDiskFont((struct TextAttr *)&tattrdbl);
 
-		if(!tfont || !tfontdbl)
-		{
-			IExec->DebugPrintF("[videotex.datatype] Cannot open MtA.font\n");
-			return ERROR_NOT_IMPLEMENTED;
-		}
+	if(!tfont || !tfontdbl) {
+		IExec->DebugPrintF("[videotex.datatype] Cannot open MtA.font\n");
+		return ERROR_NOT_IMPLEMENTED;
+	}
 
         for(row=0;row<charheight; row++)
         {
-			gfx=0;
-			bcol=0;
-			fcol=7;
-			gfxmode=0;
-			heldchar=32;
-			hold=0;
+		gfx=0;
+		bcol=0;
+		fcol=7;
+		gfxmode=0;
+		heldchar=32;
+		hold=0;
 
-			if(dbl==1)
-			{
-				IDOS->ChangeFilePosition(file,40,OFFSET_CURRENT);
-				row++;
-				if(row>=charheight) break;
-			}
+		if(dbl==1) {
+			IDOS->ChangeFilePosition(file,40,OFFSET_CURRENT);
+			row++;
+			if(row>=charheight) break;
+		}
 
-			font=tfont;
-			dbl=0;
+		font=tfont;
+		dbl=0;
 
-           for(col=0; col<charwidth; col++)
-           {
-		vtxchar = IDOS->FGetC(file);
-
-// need to write our bitmap here
-
-		if(vtxchar == -1) break;
-
-		if(vtxchar==0x1B) {
+		for(col=0; col<charwidth; col++) {
 			vtxchar = IDOS->FGetC(file);
-			esc = 1; // ignore non-escape codes from now on
 
-			if(vtxchar>=0x40 && vtxchar<=0x47)
-			{
-				fcol=vtxchar=0x40;
-				gfx=0;
-				heldchar=32;
-				vtxchar=heldchar;
+			// need to write our bitmap here
+
+			if(vtxchar == -1) break;
+
+			if(vtxchar==0x1B) {
+				vtxchar = IDOS->FGetC(file);
+				esc = 1; // ignore non-escape codes from now on
+
+				if(vtxchar>=0x40 && vtxchar<=0x47) {
+					fcol=vtxchar=0x40;
+					gfx=0;
+					heldchar=32;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar>=0x50 && vtxchar<=0x57) {
+					fcol=vtxchar-0x50;
+					gfx=1;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x59) {
+					gfxmode=0;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x5A) {
+					gfxmode=64;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x5C) {
+					bcol=0;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x5D) {
+					bcol=fcol;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x4C) {
+					font=tfont;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x4D) {
+					font=tfontdbl;
+					vtxchar=heldchar;
+					dbl=1;
+				}
+
+				if(vtxchar==0x48 || vtxchar == 0x49 || vtxchar==0x58) {
+					// flash, steady and conceal - not implemented.
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x5E) {
+					hold=1;
+					heldchar=32;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x5F) {
+					hold=0;
+					heldchar=32;
+					vtxchar=heldchar;
+				}
 			}
 
-			if(vtxchar>=0x50 && vtxchar<=0x57)
-			{
-				fcol=vtxchar-0x50;
-				gfx=1;
-				vtxchar=heldchar;
+			if(esc == 0) {
+				if(vtxchar>=0x00 && vtxchar<=0x07) {
+					fcol=vtxchar;
+					gfx=0;
+					heldchar=32;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar>=0x10 && vtxchar<=0x17) {
+					fcol=vtxchar-0x10;
+					gfx=1;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x19) {
+					gfxmode=0;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x1A) {
+					gfxmode=64;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x1C) {
+					bcol=0;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x1D) {
+					bcol=fcol;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x0C) {
+					font=tfont;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x0D) {
+					font=tfontdbl;
+					vtxchar=heldchar;
+					dbl=1;
+				}
+
+				if(vtxchar==0x08 || vtxchar == 0x09 || vtxchar==0x18) {
+					// flash, steady and conceal - not implemented.
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x1E) {
+					hold=1;
+					heldchar=32;
+					vtxchar=heldchar;
+				}
+
+				if(vtxchar==0x1F) {
+					hold=0;
+					heldchar=32;
+					vtxchar=heldchar;
+				}
 			}
 
-			if(vtxchar==0x59)
-			{
-				gfxmode=0;
-				vtxchar=heldchar;
+			if(gfx==1) {
+				if(vtxchar>=0x20 && vtxchar<=0x3F) {
+					textadd=96+gfxmode;
+				} else if(vtxchar>=0x60 && vtxchar<=0x7F) {
+					textadd=64+gfxmode;
+				} else {
+					textadd=0;
+				}
+
+				if(hold==1) heldchar=vtxchar;
 			}
 
-			if(vtxchar==0x5A)
-			{
-				gfxmode=64;
-				vtxchar=heldchar;
-			}
+			overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
+			textadd=0;
 
-			if(vtxchar==0x5C)
-			{
-				bcol=0;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x5D)
-			{
-				bcol=fcol;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x4C)
-			{
-				font=tfont;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x4D)
-			{
-				font=tfontdbl;
-				vtxchar=heldchar;
-				dbl=1;
-			}
-
-			if(vtxchar==0x48 || vtxchar == 0x49 || vtxchar==0x58)
-			{
-				// flash, steady and conceal - not implemented.
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x5E)
-			{
-				hold=1;
-				heldchar=32;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x5F)
-			{
-				hold=0;
-				heldchar=32;
-				vtxchar=heldchar;
-			}
+			if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
 		}
-
-		if(esc == 0) {
-			if(vtxchar>=0x00 && vtxchar<=0x07)
-			{
-				fcol=vtxchar;
-				gfx=0;
-				heldchar=32;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar>=0x10 && vtxchar<=0x17)
-			{
-				fcol=vtxchar-0x10;
-				gfx=1;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x19)
-			{
-				gfxmode=0;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x1A)
-			{
-				gfxmode=64;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x1C)
-			{
-				bcol=0;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x1D)
-			{
-				bcol=fcol;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x0C)
-			{
-				font=tfont;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x0D)
-			{
-				font=tfontdbl;
-				vtxchar=heldchar;
-				dbl=1;
-			}
-
-			if(vtxchar==0x08 || vtxchar == 0x09 || vtxchar==0x18)
-			{
-				// flash, steady and conceal - not implemented.
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x1E)
-			{
-				hold=1;
-				heldchar=32;
-				vtxchar=heldchar;
-			}
-
-			if(vtxchar==0x1F)
-			{
-				hold=0;
-				heldchar=32;
-				vtxchar=heldchar;
-			}
-
-
-		}
-
-		if(gfx==1)
-		{
-			if(vtxchar>=0x20 && vtxchar<=0x3F)
-			{
-				textadd=96+gfxmode;
-			}
-			else if(vtxchar>=0x60 && vtxchar<=0x7F)
-			{
-				textadd=64+gfxmode;
-			}
-			else
-			{
-				textadd=0;
-			}
-
-			if(hold==1) heldchar=vtxchar;
-		}
-
-
 	}
-	overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
-	textadd=0;
-
-	if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
-
-
-	}
-}
 
 	IGraphics->CloseFont(tfont);
 	IGraphics->CloseFont(tfontdbl);
@@ -568,9 +530,9 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 	}
 /**********/
 
-		bmh->bmh_Width = width;
-		bmh->bmh_Height = height;
-		bmh->bmh_Depth = 3;
+	bmh->bmh_Width = width;
+	bmh->bmh_Height = height;
+	bmh->bmh_Depth = 3;
 
 //	uint32 bpr = (bmh->bmh_Width + 3) & ~3;
 
