@@ -53,8 +53,6 @@ void overlaytext(long xoffset,long yoffset,UBYTE text,ULONG pix,ULONG pix2,struc
 
 			while(pchar<clen)
 			{
-				if(b>255) continue;
-
 				tc=tchardata[b];
 
 				z=8;
