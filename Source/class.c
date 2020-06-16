@@ -75,6 +75,9 @@ void overlaytext(long xoffset,long yoffset,UBYTE text,ULONG pix,ULONG pix2,struc
 					}
 					else
 					{
+
+IExec->DebugPrintF("w %d, h %d, w*h %d, i %d\n", width, height, width * height, i);
+
 						iconimg[i]=pix2;
 					}
 //if(i>76799) IExec->DebugPrintF("write posn %ld\n",i);
@@ -516,6 +519,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 			if(dbl!=(row-1)) {
 				overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
+
 				textadd=0;
 
 			//	if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
