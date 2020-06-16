@@ -67,7 +67,7 @@ void overlaytext(long xoffset,long yoffset,UBYTE text,ULONG pix,ULONG pix2,struc
 
 				for(x=0;x<z;x++)
 				{
-					if(i >= width * height) return;
+					if((i >= width * height) || (i<0)) return;
 
 					if(tc & 0x80)
 					{
@@ -75,9 +75,6 @@ void overlaytext(long xoffset,long yoffset,UBYTE text,ULONG pix,ULONG pix2,struc
 					}
 					else
 					{
-
-IExec->DebugPrintF("w %d, h %d, w*h %d, i %d\n", width, height, width * height, i);
-
 						iconimg[i]=pix2;
 					}
 //if(i>76799) IExec->DebugPrintF("write posn %ld\n",i);
@@ -352,6 +349,8 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			if(vtxchar == 0x0D) break;
 
 			if(vtxchar == 0x0C) break; // CS (should be double break)
+
+#if 0 // prestel active position codes
 			if(vtxchar == 0x08) { // APB
 				col-=2;
 				continue;
@@ -367,6 +366,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				row--;
 				continue;
 			}
+#endif
 			if(vtxchar == 0x1E) { // APH
 				row=0;
 				col=-1;
