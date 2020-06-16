@@ -329,7 +329,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				esc = 1; // ignore non-escape codes from now on
 
 				if(vtxchar>=0x40 && vtxchar<=0x47) {
-					fcol=vtxchar=0x40;
+					fcol=vtxchar-0x40;
 					gfx=0;
 					heldchar=32;
 					vtxchar=heldchar;
