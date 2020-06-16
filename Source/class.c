@@ -202,7 +202,6 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 	struct FileInfoBlock *fib = NULL;
 	uint32 coltemp;
 	uint32 vtxformat = VTX_RAW;
-	int esc = 0;
 	char header[10];
 	ULONG framestart[256];
 
