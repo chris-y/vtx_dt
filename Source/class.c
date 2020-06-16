@@ -198,7 +198,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 	struct TextFont *tfont,*tfontdbl,*font;
 	struct ColorRegister *ocmap = NULL;
 	uint32 *ocregs = NULL;
-	int fcol=7,bcol=0,textadd=0,gfx=0,gfxmode=0,heldchar=32,hold=0,dbl=0;
+	int fcol=7,bcol=0,textadd=0,gfx=0,gfxmode=0,heldchar=32,hold=0,dbl=-10;
 	struct FileInfoBlock *fib = NULL;
 	uint32 coltemp;
 	uint32 vtxformat = VTX_RAW;
@@ -336,14 +336,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 		heldchar=32;
 		hold=0;
 
-		if((dbl==1) && (vtxformat != VTX_VIEWDATA)) {
-			IDOS->ChangeFilePosition(file,40,OFFSET_CURRENT);
-			row++;
-			if(row>=charheight) break;
-		}
-
 		font=tfont;
-		dbl=0;
 
 		for(col=0; col<charwidth; col++) {
 			vtxchar = IDOS->FGetC(file);
@@ -425,7 +418,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				if(vtxchar==0x4D) {
 					font=tfontdbl;
 					vtxchar=heldchar;
-					dbl=1;
+					dbl=row;
 				}
 
 				if(vtxchar==0x48 || vtxchar == 0x49 || vtxchar==0x58) {
@@ -488,7 +481,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				if(vtxchar==0x0D) {
 					font=tfontdbl;
 					vtxchar=heldchar;
-					dbl=1;
+					dbl=row;
 				}
 
 				if(vtxchar==0x08 || vtxchar == 0x09 || vtxchar==0x18) {
@@ -521,10 +514,12 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				if(hold==1) heldchar=vtxchar;
 			}
 
-			overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
-			textadd=0;
+			if(dbl!=(row-1)) {
+				overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
+				textadd=0;
 
-			if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
+				if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
+			}
 		}
 	}
 
