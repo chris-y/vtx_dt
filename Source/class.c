@@ -352,7 +352,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				continue;
 			}
 
-			if(vtxchar == 0x0C) break; // CS (should be double break)
+//			if(vtxchar == 0x0C) break; // CS (should be double break)
 
 #if 0 // prestel active position codes
 			if(vtxchar == 0x08) { // APB
@@ -531,7 +531,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			}
 			col++;
 		}
-		if(vtxchar == 0x0C) break; // CS (should be double break)
+//		if(vtxchar == 0x0C) break; // CS (should be double break)
 	}
 
 	IGraphics->CloseFont(tfont);
