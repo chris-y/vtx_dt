@@ -200,6 +200,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 	struct FileInfoBlock *fib = NULL;
 	uint32 coltemp;
 	uint32 vtxformat = VTX_RAW;
+	int esc = 0;
 	char header[10];
 
 	IDOS->ChangeFilePosition(file,0,OFFSET_BEGINNING);
@@ -321,113 +322,196 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
            for(col=0; col<charwidth; col++)
            {
-				vtxchar = IDOS->FGetC(file);
+		vtxchar = IDOS->FGetC(file);
 
 // need to write our bitmap here
 
-				if(vtxchar == -1) break;
+		if(vtxchar == -1) break;
 
-				if(vtxchar>=0x00 && vtxchar<=0x07)
-				{
-					fcol=vtxchar;
-					gfx=0;
-					heldchar=32;
-					vtxchar=heldchar;
-				}
+		if(vtxchar==0x1B) {
+			vtxchar = IDOS->FGetC(file);
+			esc = 1; // ignore non-escape codes from now on
 
-				if(vtxchar>=0x10 && vtxchar<=0x17)
-				{
-					fcol=vtxchar-0x10;
-					gfx=1;
-					vtxchar=heldchar;
-				}
+			if(vtxchar>=0x40 && vtxchar<=0x47)
+			{
+				fcol=vtxchar=0x40;
+				gfx=0;
+				heldchar=32;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x19)
-				{
-					gfxmode=0;
-					vtxchar=heldchar;
-				}
+			if(vtxchar>=0x50 && vtxchar<=0x57)
+			{
+				fcol=vtxchar-0x50;
+				gfx=1;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x1A)
-				{
-					gfxmode=64;
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x59)
+			{
+				gfxmode=0;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x1C)
-				{
-					bcol=0;
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x5A)
+			{
+				gfxmode=64;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x1D)
-				{
-					bcol=fcol;
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x5C)
+			{
+				bcol=0;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x0C)
-				{
-					font=tfont;
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x5D)
+			{
+				bcol=fcol;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x0D)
-				{
-					font=tfontdbl;
-					vtxchar=heldchar;
-					dbl=1;
-				}
+			if(vtxchar==0x4C)
+			{
+				font=tfont;
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x08 || vtxchar == 0x09 || vtxchar==0x18)
-				{
-					// flash, steady and conceal - not implemented.
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x4D)
+			{
+				font=tfontdbl;
+				vtxchar=heldchar;
+				dbl=1;
+			}
 
-				if(vtxchar==0x1E)
-				{
-					hold=1;
-					heldchar=32;
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x48 || vtxchar == 0x49 || vtxchar==0x58)
+			{
+				// flash, steady and conceal - not implemented.
+				vtxchar=heldchar;
+			}
 
-				if(vtxchar==0x1F)
-				{
-					hold=0;
-					heldchar=32;
-					vtxchar=heldchar;
-				}
+			if(vtxchar==0x5E)
+			{
+				hold=1;
+				heldchar=32;
+				vtxchar=heldchar;
+			}
 
-				if(gfx==1)
-				{
-					if(vtxchar>=0x20 && vtxchar<=0x3F)
-					{
-						textadd=96+gfxmode;
-					}
-					else if(vtxchar>=0x60 && vtxchar<=0x7F)
-					{
-						textadd=64+gfxmode;
-					}
-					else
-					{
-						textadd=0;
-					}
-
-					if(hold==1) heldchar=vtxchar;
-				}
-
-				overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
-				textadd=0;
-
-				if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
-
-
+			if(vtxchar==0x5F)
+			{
+				hold=0;
+				heldchar=32;
+				vtxchar=heldchar;
 			}
 		}
 
-		IGraphics->CloseFont(tfont);
-		IGraphics->CloseFont(tfontdbl);
+		if(esc == 0) {
+			if(vtxchar>=0x00 && vtxchar<=0x07)
+			{
+				fcol=vtxchar;
+				gfx=0;
+				heldchar=32;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar>=0x10 && vtxchar<=0x17)
+			{
+				fcol=vtxchar-0x10;
+				gfx=1;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x19)
+			{
+				gfxmode=0;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x1A)
+			{
+				gfxmode=64;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x1C)
+			{
+				bcol=0;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x1D)
+			{
+				bcol=fcol;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x0C)
+			{
+				font=tfont;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x0D)
+			{
+				font=tfontdbl;
+				vtxchar=heldchar;
+				dbl=1;
+			}
+
+			if(vtxchar==0x08 || vtxchar == 0x09 || vtxchar==0x18)
+			{
+				// flash, steady and conceal - not implemented.
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x1E)
+			{
+				hold=1;
+				heldchar=32;
+				vtxchar=heldchar;
+			}
+
+			if(vtxchar==0x1F)
+			{
+				hold=0;
+				heldchar=32;
+				vtxchar=heldchar;
+			}
+
+
+		}
+
+		if(gfx==1)
+		{
+			if(vtxchar>=0x20 && vtxchar<=0x3F)
+			{
+				textadd=96+gfxmode;
+			}
+			else if(vtxchar>=0x60 && vtxchar<=0x7F)
+			{
+				textadd=64+gfxmode;
+			}
+			else
+			{
+				textadd=0;
+			}
+
+			if(hold==1) heldchar=vtxchar;
+		}
+
+
+	}
+	overlaytext(col*8,row*10,vtxchar+textadd,fcol,bcol,font,width,height,bitmap,cl);
+	textadd=0;
+
+	if((font==tfont) && ((row+1) < charheight)) overlaytext(col*8,(row+1)*10,32,fcol,bcol,font,width,height,bitmap,cl); // write the same colour data underneath in case of double-height codes.
+
+
+	}
+}
+
+	IGraphics->CloseFont(tfont);
+	IGraphics->CloseFont(tfontdbl);
 
 // these are the colours
 
