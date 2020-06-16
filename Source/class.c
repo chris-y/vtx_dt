@@ -354,23 +354,34 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 //			if(vtxchar == 0x0C) break; // CS (should be double break)
 
-#if 0 // prestel active position codes
+
 			if(vtxchar == 0x08) { // APB
 				col--;
+				if(col == -1) {
+					col = charwidth - 1;
+					row--;
+				}
 				continue;
 			}
 			if(vtxchar == 0x09) { // APF
 				col++;
+				if(col == charwidth) {
+					col = 0;
+					row++;
+				}
 				continue;
 			}
 			if(vtxchar == 0x0A) { // APD
 				row++;
+				if(row == charheight) row = 0;
 				continue;
 			}
 			if(vtxchar == 0x0B) { // APU
 				row--;
+				if(row == -1) row = charheight - 1;
 				continue;
 			}
+#if 0 // prestel active position codes
 			if(vtxchar == 0x1E) { // APH
 				row=0;
 				col=0;
