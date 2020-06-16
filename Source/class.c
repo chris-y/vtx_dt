@@ -371,12 +371,12 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				row--;
 				continue;
 			}
-#endif
 			if(vtxchar == 0x1E) { // APH
 				row=0;
 				col=0;
 				continue;
 			}
+#endif
 
 			if(vtxchar==0x1B) {
 				vtxchar = IDOS->FGetC(file);
