@@ -237,17 +237,19 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			vtxchar = IDOS->FGetC(file);
 			if(vtxchar == -1) break;
 			vtxchar &= 0x7F;
+
+			if(vtxchar == 0x1B) {
+				vtxformat = VTX_VIEWDATA;
+			}
+
 			if(vtxchar == 0x0C) {
 				if(newtotal == 0) newtotal = 1;
 				newtotal++;
 				framestart[newtotal] = i+1;
-				vtxformat = VTX_VIEWDATA;
 			}
 		}
 
-		if(newtotal != 0) {
-			
-		} else {
+		if(vtxformat == VTX_RAW) {
 			newtotal = fib->fib_Size / 960;
 		}
 
@@ -349,123 +351,124 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			if(vtxchar == -1) break;
 			vtxchar &= 0x7F;
 
-			if(vtxchar == 0x0D) { // APR
-				col = 0;
-				continue;
-			}
+			if(vtxformat == VTX_VIEWDATA) {
 
-//			if(vtxchar == 0x0C) break; // CS (should be double break)
-
-			if(vtxchar == 0x08) { // APB
-				col--;
-				if(col == -1) {
-					col = charwidth - 1;
-					row--;
-				}
-				continue;
-			}
-			if(vtxchar == 0x09) { // APF
-				col++;
-				if(col == charwidth) {
+				if(vtxchar == 0x0D) { // APR
 					col = 0;
-					row++;
+					continue;
 				}
-				continue;
-			}
-			if(vtxchar == 0x0A) { // APD
-				row++;
-				if(row == charheight) row = 0;
-				continue;
-			}
-			if(vtxchar == 0x0B) { // APU
-				row--;
-				if(row == -1) row = charheight - 1;
-				continue;
-			}
+
+//				if(vtxchar == 0x0C) break; // CS (should be double break)
+
+				if(vtxchar == 0x08) { // APB
+					col--;
+					if(col == -1) {
+						col = charwidth - 1;
+						row--;
+					}
+					continue;
+				}
+				if(vtxchar == 0x09) { // APF
+					col++;
+					if(col == charwidth) {
+						col = 0;
+						row++;
+					}
+					continue;
+				}
+				if(vtxchar == 0x0A) { // APD
+					row++;
+					if(row == charheight) row = 0;
+					continue;
+				}
+				if(vtxchar == 0x0B) { // APU
+					row--;
+					if(row == -1) row = charheight - 1;
+					continue;
+				}
 #if 0 // prestel active position codes
-			if(vtxchar == 0x1E) { // APH
-				row=0;
-				col=0;
-				continue;
-			}
+				if(vtxchar == 0x1E) { // APH
+					row=0;
+					col=0;
+					continue;
+				}
 #endif
 
-			if((vtxformat == VTX_VIEWDATA) &&
-				((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar < 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F))) {
-				//undefined or unsupported
-				continue;
-			} 
-
-			if(vtxchar==0x1B) {
-				vtxchar = IDOS->FGetC(file);
-				if(vtxchar == -1) break;
-				vtxchar &= 0x7F;
-
-				vtxformat = VTX_VIEWDATA; // ignore non-escape codes from now on
-
-				if(vtxchar>=0x40 && vtxchar<=0x47) {
-					fcol=vtxchar-0x40;
-					gfx=0;
-					heldchar=32;
-					vtxchar=heldchar;
+				if(((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar < 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F))) {
+					//undefined or unsupported
+					continue;
 				}
 
-				if(vtxchar>=0x50 && vtxchar<=0x57) {
-					fcol=vtxchar-0x50;
-					gfx=1;
-					vtxchar=heldchar;
-				}
 
-				if(vtxchar==0x59) {
-					gfxmode=0;
-					vtxchar=heldchar;
-				}
+				if(vtxchar==0x1B) {
+					vtxchar = IDOS->FGetC(file);
+					if(vtxchar == -1) break;
+					vtxchar &= 0x7F;
 
-				if(vtxchar==0x5A) {
-					gfxmode=64;
-					vtxchar=heldchar;
-				}
+	//				vtxformat = VTX_VIEWDATA; // ignore non-escape codes from now on
 
-				if(vtxchar==0x5C) {
-					bcol=0;
-					vtxchar=heldchar;
-				}
+					if(vtxchar>=0x40 && vtxchar<=0x47) {
+						fcol=vtxchar-0x40;
+						gfx=0;
+						heldchar=32;
+						vtxchar=heldchar;
+					}
 
-				if(vtxchar==0x5D) {
-					bcol=fcol;
-					vtxchar=heldchar;
-				}
+					if(vtxchar>=0x50 && vtxchar<=0x57) {
+						fcol=vtxchar-0x50;
+						gfx=1;
+						vtxchar=heldchar;
+					}
 
-				if(vtxchar==0x4C) {
-					font=tfont;
-					vtxchar=heldchar;
-				}
+					if(vtxchar==0x59) {
+						gfxmode=0;
+						vtxchar=heldchar;
+					}
 
-				if(vtxchar==0x4D) {
-					font=tfontdbl;
-					vtxchar=heldchar;
-					dbl=row;
-				}
+					if(vtxchar==0x5A) {
+						gfxmode=64;
+						vtxchar=heldchar;
+					}
 
-				if(vtxchar==0x48 || vtxchar == 0x49 || vtxchar==0x58) {
-					// flash, steady and conceal - not implemented.
-					vtxchar=heldchar;
-				}
+					if(vtxchar==0x5C) {
+						bcol=0;
+						vtxchar=heldchar;
+					}
 
-				if(vtxchar==0x5E) {
-					hold=1;
-					heldchar=32;
-					vtxchar=heldchar;
-				}
+					if(vtxchar==0x5D) {
+						bcol=fcol;
+						vtxchar=heldchar;
+					}
 
-				if(vtxchar==0x5F) {
-					hold=0;
-					heldchar=32;
-					vtxchar=heldchar;
-				}
-			}
+					if(vtxchar==0x4C) {
+						font=tfont;
+						vtxchar=heldchar;
+					}
 
-			if(vtxformat != VTX_VIEWDATA) {
+					if(vtxchar==0x4D) {
+						font=tfontdbl;
+						vtxchar=heldchar;
+						dbl=row;
+					}
+
+					if(vtxchar==0x48 || vtxchar == 0x49 || vtxchar==0x58) {
+						// flash, steady and conceal - not implemented.
+						vtxchar=heldchar;
+					}
+
+					if(vtxchar==0x5E) {
+						hold=1;
+						heldchar=32;
+						vtxchar=heldchar;
+					}
+
+					if(vtxchar==0x5F) {
+						hold=0;
+						heldchar=32;
+						vtxchar=heldchar;
+					}
+				}
+			} else {
 				if(vtxchar>=0x00 && vtxchar<=0x07) {
 					fcol=vtxchar;
 					gfx=0;
