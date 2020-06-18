@@ -350,11 +350,14 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			vtxchar &= 0x7F;
 
 			if(vtxformat == VTX_VIEWDATA) {
+
+IExec->DebugPrintF("[videotex.datatype] row=%d col=%d char=%x\n", row, col, vtxchar);
+
 				if(vtxchar == 0x0D) { // APR
 					col = 0;
 					continue;
 				}
-#if 0 // Active Position codes
+
 				if(vtxchar == 0x0C) break; // CS (should be double break)
 
 				if(vtxchar == 0x08) { // APB
@@ -389,7 +392,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 					col=0;
 					continue;
 				}
-#endif
+
 				if(((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar < 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F))) {
 					//undefined or unsupported
 					continue;
