@@ -356,7 +356,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 					continue;
 				}
 
-//				if(vtxchar == 0x0C) break; // CS (should be double break)
+				if(vtxchar == 0x0C) break; // CS (should be double break)
 
 				if(vtxchar == 0x08) { // APB
 					col--;
@@ -384,13 +384,12 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 					if(row == -1) row = charheight - 1;
 					continue;
 				}
-#if 0 // prestel active position codes
+
 				if(vtxchar == 0x1E) { // APH
 					row=0;
 					col=0;
 					continue;
 				}
-#endif
 
 				if(((vtxchar < 0x08) || ((vtxchar >= 0x0E) && (vtxchar < 0x1B)) || (vtxchar == 0x1C) || (vtxchar == 0x1D) || (vtxchar == 0x1F))) {
 					//undefined or unsupported
@@ -402,8 +401,6 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 					vtxchar = IDOS->FGetC(file);
 					if(vtxchar == -1) break;
 					vtxchar &= 0x7F;
-
-	//				vtxformat = VTX_VIEWDATA; // ignore non-escape codes from now on
 
 					if(vtxchar>=0x40 && vtxchar<=0x47) {
 						fcol=vtxchar-0x40;
@@ -550,7 +547,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			}
 			col++;
 		}
-//		if(vtxchar == 0x0C) break; // CS (should be double break)
+		if((vtxformat == VTX_VIEWDATA) && (vtxchar == 0x0C)) break; // CS (should be double break)
 	}
 
 	IGraphics->CloseFont(tfont);
