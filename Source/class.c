@@ -551,7 +551,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			}
 			col++;
 		}
-//		if((vtxformat == VTX_VIEWDATA) && (vtxchar == 0x0C)) break; // CS (should be double break)
+		if((vtxformat == VTX_VIEWDATA) && (vtxchar == 0x0C)) break; // CS (should be double break)
 	}
 
 	IGraphics->CloseFont(tfont);
