@@ -226,6 +226,8 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 	if(vtxformat == VTX_RAW)
 	{
+		IDOS->ChangeFilePosition(file,0,OFFSET_BEGINNING);
+
 		int newtotal = 1;
 		fib = IDOS->AllocDosObject(DOS_FIB,NULL);
 		IDOS->ExamineFH(file,fib);
@@ -351,7 +353,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 			if(vtxformat == VTX_VIEWDATA) {
 
-IExec->DebugPrintF("[videotex.datatype] row=%d col=%d char=%x\n", row, col, vtxchar);
+//IExec->DebugPrintF("[videotex.datatype] row=%d col=%d char=%x\n", row, col, vtxchar);
 
 				if(vtxchar == 0x0D) { // APR
 					col = 0;
