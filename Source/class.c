@@ -226,12 +226,11 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 	if(vtxformat == VTX_RAW)
 	{
-		int newtotal = 1;
+		int newtotal = 0;
 		fib = IDOS->AllocDosObject(DOS_FIB,NULL);
 		IDOS->ExamineFH(file,fib);
 
 		framestart[0] = 0;
-		framestart[1] = 0;
 
 		for(int i=0;i<fib->fib_Size;i++) {
 			vtxchar = IDOS->FGetC(file);
