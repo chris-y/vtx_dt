@@ -226,7 +226,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 
 	if(vtxformat == VTX_RAW)
 	{
-		int newtotal = 0;
+		int newtotal = 1;
 		fib = IDOS->AllocDosObject(DOS_FIB,NULL);
 		IDOS->ExamineFH(file,fib);
 
@@ -242,8 +242,8 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 			}
 
 			if(vtxchar == 0x0C) {
-				newtotal++;
 				framestart[newtotal] = i+1;
+				newtotal++;
 			}
 		}
 
