@@ -12,7 +12,7 @@
 	(help @copyfiles-help)
 	(source "data")
 	(dest "Devs:Datatypes")
-	(choices "Videotex" "Teletext")
+	(choices "Videotex" "Teletext" "CPT" "CPT-ASCII")
 	(infos)
 	(noposition)
 )

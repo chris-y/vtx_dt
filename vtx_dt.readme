@@ -2,7 +2,7 @@ Short:        viewdata/videotex/teletext frame datatype
 Uploader:     chris@unsatisfactorysoftware.co.uk (Chris Young)
 Author:       chris@unsatisfactorysoftware.co.uk (Chris Young)
 Type:         util/dtype
-Version:      1.3a
+Version:      1.6
 URL:          http://www.unsatisfactorysoftware.co.uk/
 Architecture: ppc-amigaos >= 4.0.0
 
@@ -13,8 +13,10 @@ and carousels of full frames.  You can create carousels by joining
 single frames together with the JOIN command.  Carousels MUST have
 the extension ".car" to be detected by the datatype.  Frames MUST
 have the extension ".bin".  As of v1.5, EP1 and EPX format files
-are also supported.  These are detected on teh file header so can
-have any extension.
+are also supported.  These are detected on the file header so can
+have any extension.  As of v1.6, Viewdata frames are properly
+supported, can be any length but MUST have the extension ".cpt".
+Carousels are split at the CS byte (0x0C).
 
 It requires the MtA font (included).  This is a modified version of
 the MtA font from the PstView archive, where I have changed the
@@ -29,7 +31,10 @@ ignored (concealed text will be printed as if it had been revealed)
 There are two descriptors as Datatypes picks some files up as binary
 and others as ASCII, so you need a descriptor for each type.
 Which is ASCII and which is binary is arbitrary and the author can't
-remember five minutes after recreating them.
+remember five minutes after recreating them.  The CPT and CPT-ASCII
+types are separate for boring reasons, if you have a conflict with
+another datatype which expects files to have the .cpt extension you
+can remove them.
 
 Most of the icons are by Ken "Ken's Icons" Lester.
 
@@ -40,6 +45,11 @@ your own risk.
 
 Please check the PGP signature in the Aminet readme against the
 archive to ensure it has not been tampered with.
+
+v1.6 (28/06/2020)
+* Tenth anniversary edition :)
+* Added full working support for Viewdata frames.  Frames included
+  with PstView now view correctly if the files are renamed to ".pst".
 
 v1.5 (06/03/2010)
 * Added support for EP1 and EPX format files.
