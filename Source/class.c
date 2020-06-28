@@ -243,7 +243,7 @@ static int32 ConvertICO (Class *cl, Object *o, BPTR file, struct BitMapHeader *b
 				vtxformat = VTX_VIEWDATA;
 			}
 
-			if(vtxchar == 0x0C) {
+			if((i>0) && (vtxchar == 0x0C)) {
 				framestart[newtotal] = i+1;
 				newtotal++;
 			}
